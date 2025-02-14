@@ -20,9 +20,10 @@ app.use(cors({
 // MongoDB connection
 const MONGO_URI = process.env.MONGO_URI;
 
-mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => console.log("❌ MongoDB Error:", err.message));
+mongoose.connect('mongodb://127.0.0.1:27017/ramyas_portfolio')
+  .then(() => console.log("✅ Connected to MongoDB Compass"))
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err.message));
+
 
 // Contact form API
 app.post('/api/contact', async (req, res) => {
