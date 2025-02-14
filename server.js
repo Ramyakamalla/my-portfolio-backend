@@ -1,47 +1,46 @@
-import express, { json, urlencoded } from 'express';
+import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config();  // Load environment variables
 
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 // Middleware
-app.use(json());
-app.use(urlencoded({ extended: true }));
-app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: 'https://my-portfolio-ij6t-kpd03wd0r-ramya-kamallas-projects.vercel.app',
+  methods: 'GET,POST',
+  allowedHeaders: 'Content-Type'
+}));
 
 // MongoDB connection
-mongoose.connect('mongodb://127.0.0.1:27017/ramyas_portfolio')
-  .then(() => {
-    console.log("Connected to DB");
-  })
-  .catch((err) => {
-    console.log(err.message);
-  });
+const MONGO_URI = process.env.MONGO_URI;
 
-// Define schema and model
-const messageSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  message: String,
-  date: { type: Date, default: Date.now }
-});
+mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch((err) => console.log("❌ MongoDB Error:", err.message));
 
-const Message = mongoose.model('Message', messageSchema);
-
-// Routes
+// Contact form API
 app.post('/api/contact', async (req, res) => {
   const { name, email, message } = req.body;
-  const newMessage = new Message({ name, email, message });
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
   try {
+    const newMessage = new Message({ name, email, message });
     await newMessage.save();
-    res.status(201).send('Message received');
+    res.status(201).json({ success: true, message: "Message received!" });
   } catch (error) {
-    res.status(500).send('Error saving message');
+    res.status(500).json({ error: "Error saving message" });
   }
 });
 
-// Start the server
+// Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
