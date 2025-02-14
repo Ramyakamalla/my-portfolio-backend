@@ -1,0 +1,17 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start:server": "node server/server.js",
+    "start:client": "react-scripts start",
+    "start": "concurrently \"npm run start:server\" \"npm run start:client\""
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "mongoose": "^8.9.7"
+  }
+}
