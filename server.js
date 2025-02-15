@@ -6,33 +6,48 @@ import dotenv from "dotenv";
 dotenv.config();  // Load environment variables
 
 const app = express();
-const PORT = process.env.PORT || 4000; // ✅ Use Render-assigned port
+const PORT = process.env.PORT || 8080; // Use 8080 as fallback
+
 
 // Middleware
 app.use(json());
 app.use(urlencoded({ extended: true }));
 
 // ✅ Configure CORS to allow requests only from your Vercel frontend
-const allowedOrigins = [process.env.FRONTEND_URL || "https://my-portfolio-ij6t-two.vercel.app"];
-app.use(cors({
-  origin: allowedOrigins,
-  methods: "GET, POST",
-  credentials: true
-}));
+
+//Configure CORS
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || "https://my-portfolio-ij6t-two.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true, // ✅ Allow cookies/authentication
+};
+
+app.use(cors(corsOptions));
+
+// ✅ Debug incoming requests (Check if requests reach the backend)
+app.use((req, res, next) => {
+  console.log(`📡 Received ${req.method} request from ${req.headers.origin}`);
+  next();
+});
+
+
 
 // ✅ Check if MONGO_URI is provided
 if (!process.env.MONGO_URI) {
   console.error("❌ ERROR: MONGO_URI is not set!");
   process.exit(1); // Stop server if DB URL is missing
 }
-
-// ✅ MongoDB connection with error handling
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, {
+  serverSelectionTimeoutMS: 10000, // Wait 10 seconds before failing
+})
   .then(() => console.log("✅ Connected to MongoDB Atlas"))
   .catch(err => {
     console.error("❌ MongoDB Connection Error:", err.message);
-    process.exit(1);
+    process.exit(1); // Exit on failure
   });
+
 
 // Define schema and model
 const messageSchema = new mongoose.Schema({
