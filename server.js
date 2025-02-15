@@ -1,6 +1,5 @@
 import express, { json, urlencoded } from 'express';
 import mongoose from 'mongoose';
-import cors from 'cors';
 import dotenv from "dotenv";
 
 dotenv.config();  // Load environment variables
@@ -16,14 +15,18 @@ app.use(urlencoded({ extended: true }));
 // ✅ Configure CORS to allow requests only from your Vercel frontend
 
 //Configure CORS
-const corsOptions = {
-  origin: process.env.FRONTEND_URL || "https://my-portfolio-ij6t-two.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true, // ✅ Allow cookies/authentication
-};
+import cors from "cors";
 
-app.use(cors(corsOptions));
+const allowedOrigins = ["https://my-portfolio-ij6t-ramya-kamallas-projects.vercel.app/"];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true,
+  })
+);
 
 // ✅ Debug incoming requests (Check if requests reach the backend)
 app.use((req, res, next) => {
