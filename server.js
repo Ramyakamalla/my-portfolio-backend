@@ -1,47 +1,47 @@
-import express from 'express';
+import express, { json, urlencoded } from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import dotenv from 'dotenv';
-
-dotenv.config();  // Load environment variables
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = 4000;
 
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-  origin: 'https://my-portfolio-ij6t-kpd03wd0r-ramya-kamallas-projects.vercel.app',
-  methods: 'GET,POST',
-  allowedHeaders: 'Content-Type'
-}));
+app.use(json());
+app.use(urlencoded({ extended: true }));
+app.use(cors());
 
 // MongoDB connection
-const MONGO_URI = process.env.MONGO_URI;
-
 mongoose.connect('mongodb://127.0.0.1:27017/ramyas_portfolio')
-  .then(() => console.log("✅ Connected to MongoDB Compass"))
-  .catch((err) => console.error("❌ MongoDB Connection Error:", err.message));
+  .then(() => {
+    console.log("Connected to DB");
+  })
+  .catch((err) => {
+    console.log(err.message);
+  });
 
+// Define schema and model
+const messageSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  message: String,
+  date: { type: Date, default: Date.now }
+});
 
-// Contact form API
+const Message = mongoose.model('Message', messageSchema);
+
+// Routes
 app.post('/api/contact', async (req, res) => {
   const { name, email, message } = req.body;
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
-
+  const newMessage = new Message({ name, email, message });
   try {
-    const newMessage = new Message({ name, email, message });
     await newMessage.save();
-    res.status(201).json({ success: true, message: "Message received!" });
+    res.status(201).send('Message received');
   } catch (error) {
-    res.status(500).json({ error: "Error saving message" });
+    res.status(500).send('Error saving message');
   }
 });
 
-// Start server
+// Start the server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
