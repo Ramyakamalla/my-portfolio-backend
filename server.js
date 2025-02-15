@@ -1,6 +1,9 @@
 import express, { json, urlencoded } from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import dotenv from "dotenv";
+
+dotenv.config();  // Load environment variables
 
 const app = express();
 const PORT = 4000;
@@ -10,13 +13,18 @@ app.use(json());
 app.use(urlencoded({ extended: true }));
 app.use(cors());
 
+const mongoURI = process.env.MONGO_URI; // Use environment variable
+
 // MongoDB connection
-mongoose.connect('mongodb://127.0.0.1:27017/ramyas_portfolio')
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
   .then(() => {
-    console.log("Connected to DB");
+    console.log("✅ MongoDB Connected Successfully!");
   })
   .catch((err) => {
-    console.log(err.message);
+    console.error("❌ MongoDB Connection Error:", err);
   });
 
 // Define schema and model
@@ -43,5 +51,5 @@ app.post('/api/contact', async (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
