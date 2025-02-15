@@ -16,16 +16,9 @@ app.use(cors());
 const mongoURI = process.env.MONGO_URI; // Use environment variable
 
 // MongoDB connection
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => {
-    console.log("✅ MongoDB Connected Successfully!");
-  })
-  .catch((err) => {
-    console.error("❌ MongoDB Connection Error:", err);
-  });
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ Connected to MongoDB Atlas"))
+  .catch(err => console.error("❌ MongoDB Connection Error:", err.message));
 
 // Define schema and model
 const messageSchema = new mongoose.Schema({
