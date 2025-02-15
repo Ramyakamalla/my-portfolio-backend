@@ -17,7 +17,7 @@ app.use(urlencoded({ extended: true }));
 //Configure CORS
 import cors from "cors";
 
-const allowedOrigins = ["https://my-portfolio-ij6t-ramya-kamallas-projects.vercel.app/"];
+const allowedOrigins = ["https://my-portfolio-ij6t-two.vercel.app"];
 
 app.use(
   cors({
